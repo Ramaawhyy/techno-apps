@@ -18,13 +18,15 @@ export default function TabLayout() {
         headerShown: false,
         tabBarButton: HapticTab,
         tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
+        tabBarStyle: {
+          backgroundColor: 'black', // Changed to set the background color to black
+          ...Platform.select({
+            ios: {
+              position: 'absolute',
+            },
+            default: {},
+          }),
+        },
       }}>
       <Tabs.Screen
         name="index"
@@ -40,6 +42,21 @@ export default function TabLayout() {
           tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
         }}
       />
+    <Tabs.Screen
+        name="[detail]"
+        options={{
+          href: null, 
+        }}
+      />
+      <Tabs.Screen
+        name="Profile"
+        options={{
+          href: null, 
+        }}
+      />
     </Tabs>
+
+    
+    
   );
 }
