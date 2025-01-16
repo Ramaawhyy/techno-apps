@@ -1,6 +1,13 @@
-# Welcome to your Expo app 👋
+# Welcome to your TechnoInfo app 👋
 
 This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+
+## The Team
+1. Rama Wahyu Hermawan (16223013) as Back-End Developer
+2. Richard Thariq Hussain (16223005) as UI/UX Designer
+3. Sophia Nur Rohmah (16223006) as Front-End Developer
+4. Tirto Rizaldy (16221001) as Technical Writer
+5. Dede Misbah (16223009) as Assistant Technical Writer
 
 ## Get started
 
