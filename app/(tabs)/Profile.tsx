@@ -28,10 +28,11 @@ export default function Profile() {
         <Image source={require('../../assets/images/BackProf.jpg')} style={styles.headerImage}/>
       </View>
 
-     
+      
       <View style={styles.detailsContainer}>
         <Text style={styles.title}>Technoinfo</Text>
 
+        
         <Text style={styles.sectionTitle}>About App</Text>
         <Text style={styles.synopsisText}>
         TechnoInfo is an online news application focusing on the world of technology.
@@ -40,10 +41,11 @@ export default function Profile() {
         The app also features a slider for top news and a dropdown menu for quick navigation to user profiles and other features.
         </Text>
 
+        
         <Text style={styles.sectionTitle}>Group Members</Text>
         <View style={styles.commentContainer}>
           <Image
-            source={require('../../assets/images/technoinfo.png')}
+            source={require('../../assets/images/Rama.png')}
             style={styles.commentImage}
           />
           <View>
@@ -53,7 +55,7 @@ export default function Profile() {
         </View>
         <View style={styles.commentContainer}>
           <Image
-            source={require('../../assets/images/technoinfo.png')} 
+            source={require('../../assets/images/Thariq.jpeg')} 
             style={styles.commentImage}
           />
           <View>
@@ -63,7 +65,7 @@ export default function Profile() {
         </View>
         <View style={styles.commentContainer}>
           <Image
-            source={require('../../assets/images/technoinfo.png')} 
+            source={require('../../assets/images/Sophia.jpeg')} 
             style={styles.commentImage}
           />
           <View>
@@ -73,7 +75,7 @@ export default function Profile() {
         </View>
         <View style={styles.commentContainer}>
           <Image
-            source={require('../../assets/images/technoinfo.png')} 
+            source={require('../../assets/images/Tirto.jpeg')} 
             style={styles.commentImage}
           />
           <View>
@@ -83,7 +85,7 @@ export default function Profile() {
         </View>
         <View style={styles.commentContainer}>
           <Image
-            source={require('../../assets/images/technoinfo.png')} 
+            source={require('../../assets/images/Dede.png')} 
             style={styles.commentImage}
           />
           <View>

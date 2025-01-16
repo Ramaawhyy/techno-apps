@@ -18,6 +18,7 @@ const { width } = Dimensions.get('window');
 
 export default function HomeScreen() {
   const [articles, setArticles] = useState([]);
+  const [sliderArticles, setSliderArticles] = useState([]);
   const [categories] = useState(['New', 'Technology', 'AI', 'Game', 'Smartphone', 'Programming', 'Software']);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
@@ -25,16 +26,8 @@ export default function HomeScreen() {
   const [isMenuVisible, setMenuVisible] = useState(false);
 
   const flatListRef = useRef(null);
-
-  const sliderImages = [
-    require('../../assets/images/Group 45.png'),
-    require('../../assets/images/Group 47.png'),
-    require('../../assets/images/Group 48.png'),
-  ];
-
   const router = useRouter();
 
-  // Fetch news articles
   useEffect(() => {
     fetchNews();
   }, [selectedCategory, searchQuery]);
@@ -42,14 +35,14 @@ export default function HomeScreen() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => {
-        const nextIndex = (prevIndex + 1) % sliderImages.length;
+        const nextIndex = (prevIndex + 1) % sliderArticles.length;
         flatListRef.current?.scrollToOffset({ offset: width * nextIndex, animated: true });
         return nextIndex;
       });
     }, 3000);
 
     return () => clearInterval(interval);
-  }, [sliderImages.length]);
+  }, [sliderArticles.length]);
 
   const fetchNews = async () => {
     try {
@@ -62,17 +55,7 @@ export default function HomeScreen() {
         `https://newsapi.org/v2/everything?q=${query}&language=en&pageSize=40&apiKey=c70808c9ec174ae6bde285ecc6b9c4ce`
       );
 
-      let filteredArticles = response.data.articles;
-
-      // Filter articles based on search query
-      if (searchQuery) {
-        filteredArticles = filteredArticles.filter((article) =>
-          article.title?.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-      }
-
-      // Filter out articles with missing or invalid data
-      filteredArticles = filteredArticles.filter(
+      let filteredArticles = response.data.articles.filter(
         (article) =>
           article.title &&
           article.description &&
@@ -80,57 +63,50 @@ export default function HomeScreen() {
           article.urlToImage !== 'https://via.placeholder.com/100'
       );
 
-      // Limit to 5 articles
+      if (searchQuery) {
+        filteredArticles = filteredArticles.filter((article) =>
+          article.title?.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+      }
+
       setArticles(filteredArticles.slice(0, 5));
+      setSliderArticles(filteredArticles.slice(0, 3)); // Hanya ambil 3 berita untuk slider
     } catch (error) {
       console.error('Error fetching news:', error);
     }
   };
 
-  const renderCategory = () => (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryContainer}>
-      {categories.map((category) => (
-        <TouchableOpacity
-          key={category}
-          onPress={() => setSelectedCategory(category)}
-          style={[
-            styles.categoryButton,
-            selectedCategory === category && styles.categoryButtonActive,
-          ]}>
-          <Text
-            style={[
-              styles.categoryText,
-              selectedCategory === category && styles.categoryTextActive,
-            ]}>
-            {category}
-          </Text>
-        </TouchableOpacity>
-      ))}
-    </ScrollView>
-  );
-
   const renderSlider = () => (
     <>
       <FlatList
         ref={flatListRef}
-        data={sliderImages}
-        keyExtractor={(_, index) => index.toString()}
+        data={sliderArticles}
+        keyExtractor={(item) => item.title}
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
-        getItemLayout={(_, index) => ({
-          length: width,
-          offset: width * index,
-          index,
-        })}
         renderItem={({ item }) => (
-          <View style={styles.sliderCard}>
-            <Image source={item} style={styles.sliderImage} />
-          </View>
+          <TouchableOpacity
+            style={styles.sliderCard}
+            onPress={() =>
+              router.push({
+                pathname: '/[detail]',
+                params: {
+                  title: item.title,
+                  image: item.urlToImage,
+                  author: item.author,
+                  content: item.content,
+                  url: item.url,
+                },
+              })
+            }>
+            <Image source={{ uri: item.urlToImage }} style={styles.sliderImage} />
+            <Text style={styles.sliderTitle}>{item.title}</Text>
+          </TouchableOpacity>
         )}
       />
       <View style={styles.dotContainer}>
-        {sliderImages.map((_, index) => (
+        {sliderArticles.map((_, index) => (
           <View
             key={index}
             style={[styles.dot, { backgroundColor: index === currentIndex ? '#007bff' : '#e0e0e0' }]}
@@ -140,55 +116,8 @@ export default function HomeScreen() {
     </>
   );
 
-  const renderNewsList = () => (
-    <FlatList
-      data={articles}
-      keyExtractor={(item) => item.title || Math.random().toString()}
-      renderItem={({ item }) => (
-        <TouchableOpacity
-          style={styles.newsCard}
-          onPress={() =>
-            router.push({
-              pathname: '/[detail]',
-              params: {
-                title: item.title,
-                image: item.urlToImage,
-                author: item.author,
-                content: item.content,
-                url: item.url,
-              },
-            })
-          }>
-          <Image
-            source={{ uri: item.urlToImage || 'https://via.placeholder.com/100' }}
-            style={styles.newsImage}
-            resizeMode="cover"
-          />
-          <View style={styles.newsContent}>
-            <Text style={styles.newsTitle}>{item.title}</Text>
-            <Text style={styles.newsDescription}>{item.description}</Text>
-          </View>
-        </TouchableOpacity>
-      )}
-      contentContainerStyle={{ paddingBottom: 20 }}
-    />
-  );
-
-  const renderSearchBar = () => (
-    <View style={styles.searchContainer}>
-      <TextInput
-        style={styles.searchInput}
-        placeholder="Search for news..."
-        value={searchQuery}
-        onChangeText={(text) => setSearchQuery(text)}
-        onSubmitEditing={fetchNews}
-      />
-    </View>
-  );
-
   return (
     <View style={{ flex: 1 }}>
-      {/* Sticky Header */}
       <View style={styles.stickyHeader}>
         <View style={styles.header}>
           <Image source={require('../../assets/images/technoinfo.png')} style={styles.logo} />
@@ -198,31 +127,76 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
         </View>
-        {renderSearchBar()}
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search for news..."
+            value={searchQuery}
+            onChangeText={(text) => setSearchQuery(text)}
+          />
+        </View>
       </View>
 
       {isMenuVisible && (
         <View style={styles.dropdownMenu}>
           <TouchableOpacity
-  style={styles.dropdownItem}
-  onPress={() => {
-    router.push('/Profile');
-    setMenuVisible(false); 
-  }}
->
-  <Text style={styles.dropdownText}>Profile</Text>
-</TouchableOpacity>
+            style={styles.dropdownItem}
+            onPress={() => {
+              router.push('/Profile');
+              setMenuVisible(false);
+            }}>
+            <Text style={styles.dropdownText}>Profile</Text>
+          </TouchableOpacity>
         </View>
       )}
 
-      {/* Main Content */}
       <ScrollView style={styles.container} contentContainerStyle={{ paddingTop: 120 }}>
         {renderSlider()}
-        {renderCategory()}
-        <Text style={styles.sectionTitle}>
-          {selectedCategory === 'All' ? 'Latest News' : selectedCategory} Articles
-        </Text>
-        {renderNewsList()}
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryContainer}>
+          {categories.map((category) => (
+            <TouchableOpacity
+              key={category}
+              onPress={() => setSelectedCategory(category)}
+              style={[
+                styles.categoryButton,
+                selectedCategory === category && styles.categoryButtonActive,
+              ]}>
+              <Text
+                style={[
+                  styles.categoryText,
+                  selectedCategory === category && styles.categoryTextActive,
+                ]}>
+                {category}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+        <FlatList
+          data={articles}
+          keyExtractor={(item) => item.title}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={styles.newsCard}
+              onPress={() =>
+                router.push({
+                  pathname: '/[detail]',
+                  params: {
+                    title: item.title,
+                    image: item.urlToImage,
+                    author: item.author,
+                    content: item.content,
+                    url: item.url,
+                  },
+                })
+              }>
+              <Image source={{ uri: item.urlToImage }} style={styles.newsImage} />
+              <View style={styles.newsContent}>
+                <Text style={styles.newsTitle}>{item.title}</Text>
+                <Text style={styles.newsDescription}>{item.description}</Text>
+              </View>
+            </TouchableOpacity>
+          )}
+        />
       </ScrollView>
     </View>
   );
@@ -233,6 +207,17 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f5f5f5',
   },
+  sliderTitle: {
+    position: 'absolute',
+    bottom: 5,
+    textAlign: 'center',
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+    paddingHorizontal: 10,
+    borderRadius: 15,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
   stickyHeader: {
     position: 'absolute',
     top: 0,
@@ -241,7 +226,7 @@ const styles = StyleSheet.create({
     zIndex: 10,
     backgroundColor: '#fff',
     elevation: 5, 
-    shadowColor: '#000',
+    shadowColor: '#000', 
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -269,7 +254,7 @@ const styles = StyleSheet.create({
     marginTop: 25,
   },
   sliderImage: {
-    width: '90%',
+    width: '100%',
     height: 200,
     resizeMode: 'cover',
     borderRadius: 15,
