@@ -8,7 +8,6 @@ import {
   ScrollView,
   TouchableOpacity,
   Dimensions,
-  TextInput,
 } from 'react-native';
 import axios from 'axios';
 import { useRouter } from 'expo-router';
@@ -19,9 +18,8 @@ const { width } = Dimensions.get('window');
 export default function HomeScreen() {
   const [articles, setArticles] = useState([]);
   const [sliderArticles, setSliderArticles] = useState([]);
-  const [categories] = useState(['New', 'Technology', 'AI', 'Game', 'Smartphone', 'Programming', 'Software']);
+  const [categories] = useState(['All', 'Fashion', 'Beauty', 'Lifestyle', 'Travel', 'Food', 'Health', 'Wellness']);
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [searchQuery, setSearchQuery] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMenuVisible, setMenuVisible] = useState(false);
 
@@ -30,7 +28,7 @@ export default function HomeScreen() {
 
   useEffect(() => {
     fetchNews();
-  }, [selectedCategory, searchQuery]);
+  }, [selectedCategory]);
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -46,10 +44,7 @@ export default function HomeScreen() {
 
   const fetchNews = async () => {
     try {
-      const query =
-        selectedCategory === 'All'
-          ? 'technology+OR+game+OR+AI+OR+smartphone+OR+programming+OR+software+OR+developer'
-          : selectedCategory.toLowerCase();
+      const query = selectedCategory === 'All' ? 'fashion+OR+beauty+OR+lifestyle+OR+travel+OR+food+OR+health+OR+wellness' : selectedCategory.toLowerCase();
 
       const response = await axios.get(
         `https://newsapi.org/v2/everything?q=${query}&language=en&pageSize=40&apiKey=c70808c9ec174ae6bde285ecc6b9c4ce`
@@ -63,80 +58,26 @@ export default function HomeScreen() {
           article.urlToImage !== 'https://via.placeholder.com/100'
       );
 
-      if (searchQuery) {
-        filteredArticles = filteredArticles.filter((article) =>
-          article.title?.toLowerCase().includes(searchQuery.toLowerCase())
-        );
-      }
-
-      setArticles(filteredArticles.slice(0, 5));
-      setSliderArticles(filteredArticles.slice(0, 3)); // Hanya ambil 3 berita untuk slider
+      setSliderArticles(filteredArticles.slice(0, 3)); // Slider menampilkan 3 berita pertama
+      setArticles(filteredArticles.slice(3, 8)); // Daftar berita setelah slider
     } catch (error) {
       console.error('Error fetching news:', error);
     }
   };
 
-  const renderSlider = () => (
-    <>
-      <FlatList
-        ref={flatListRef}
-        data={sliderArticles}
-        keyExtractor={(item) => item.title}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.sliderCard}
-            onPress={() =>
-              router.push({
-                pathname: '/[detail]',
-                params: {
-                  title: item.title,
-                  image: item.urlToImage,
-                  author: item.author,
-                  content: item.content,
-                  url: item.url,
-                },
-              })
-            }>
-            <Image source={{ uri: item.urlToImage }} style={styles.sliderImage} />
-            <Text style={styles.sliderTitle}>{item.title}</Text>
-          </TouchableOpacity>
-        )}
-      />
-      <View style={styles.dotContainer}>
-        {sliderArticles.map((_, index) => (
-          <View
-            key={index}
-            style={[styles.dot, { backgroundColor: index === currentIndex ? '#007bff' : '#e0e0e0' }]}
-          />
-        ))}
-      </View>
-    </>
-  );
-
   return (
     <View style={{ flex: 1 }}>
-      <View style={styles.stickyHeader}>
-        <View style={styles.header}>
-          <Image source={require('../../assets/images/technoinfo.png')} style={styles.logo} />
-          <View style={styles.iconContainer}>
-            <TouchableOpacity onPress={() => setMenuVisible(!isMenuVisible)}>
-              <Icon name="menu-outline" size={25} color="#000" />
-            </TouchableOpacity>
-          </View>
-        </View>
-        <View style={styles.searchContainer}>
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search for news..."
-            value={searchQuery}
-            onChangeText={(text) => setSearchQuery(text)}
-          />
+      {/* Header */}
+      <View style={styles.header}>
+        <Image source={require('../../assets/images/technoinfo.png')} style={styles.logo} />
+        <View style={styles.iconContainer}>
+          <TouchableOpacity onPress={() => setMenuVisible(!isMenuVisible)}>
+            <Icon name="menu-outline" size={25} color="#ff4081" />
+          </TouchableOpacity>
         </View>
       </View>
 
+      {/* Dropdown Menu */}
       {isMenuVisible && (
         <View style={styles.dropdownMenu}>
           <TouchableOpacity
@@ -150,27 +91,58 @@ export default function HomeScreen() {
         </View>
       )}
 
-      <ScrollView style={styles.container} contentContainerStyle={{ paddingTop: 120 }}>
-        {renderSlider()}
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryContainer}>
-          {categories.map((category) => (
+      <ScrollView style={styles.container}>
+        <Text style={styles.welcomeText}>✨ Selamat Datang di Aplikasi ✨</Text>
+
+        {/* Slider */}
+        <FlatList
+          ref={flatListRef}
+          horizontal
+          pagingEnabled
+          showsHorizontalScrollIndicator={false}
+          data={sliderArticles}
+          keyExtractor={(item) => item.title}
+          renderItem={({ item }) => (
             <TouchableOpacity
-              key={category}
-              onPress={() => setSelectedCategory(category)}
-              style={[
-                styles.categoryButton,
-                selectedCategory === category && styles.categoryButtonActive,
-              ]}>
-              <Text
-                style={[
-                  styles.categoryText,
-                  selectedCategory === category && styles.categoryTextActive,
-                ]}>
-                {category}
+              onPress={() =>
+                router.push({
+                  pathname: '/[detail]',
+                  params: {
+                    title: item.title,
+                    image: item.urlToImage,
+                    author: item.author,
+                    content: item.content,
+                    url: item.url,
+                  },
+                })
+              }>
+              <Image source={{ uri: item.urlToImage }} style={styles.sliderImage} />
+              <View style={styles.overlay}>
+                <Text style={styles.sliderText}>{item.title}</Text>
+              </View>
+            </TouchableOpacity>
+          )}
+        />
+
+        {/* Kategori */}
+        <Text style={styles.categoryHeader}>🌸 Kategori 🌸</Text>
+        <FlatList
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          data={categories}
+          keyExtractor={(item) => item}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              onPress={() => setSelectedCategory(item)}
+              style={[styles.categoryButton, selectedCategory === item && styles.categoryButtonActive]}>
+              <Text style={[styles.categoryText, selectedCategory === item && styles.categoryTextActive]}>
+                {item}
               </Text>
             </TouchableOpacity>
-          ))}
-        </ScrollView>
+          )}
+        />
+
+        {/* Daftar Berita */}
         <FlatList
           data={articles}
           keyExtractor={(item) => item.title}
@@ -192,7 +164,6 @@ export default function HomeScreen() {
               <Image source={{ uri: item.urlToImage }} style={styles.newsImage} />
               <View style={styles.newsContent}>
                 <Text style={styles.newsTitle}>{item.title}</Text>
-                <Text style={styles.newsDescription}>{item.description}</Text>
               </View>
             </TouchableOpacity>
           )}
@@ -203,167 +174,25 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  sliderTitle: {
-    position: 'absolute',
-    bottom: 5,
-    textAlign: 'center',
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-    paddingHorizontal: 10,
-    borderRadius: 15,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  stickyHeader: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 10,
-    backgroundColor: '#fff',
-    elevation: 5, 
-    shadowColor: '#000', 
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 10,
-    backgroundColor: '#F2F2F2',
-  },
-  logo: {
-    width: 200,
-    height: 50,
-  },
-  iconContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  sliderCard: {
-    width: width,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 15,
-    marginTop: 25,
-  },
-  sliderImage: {
-    width: '100%',
-    height: 200,
-    resizeMode: 'cover',
-    borderRadius: 15,
-  },
-  categoryContainer: {
-    flexDirection: 'row',
-    padding: 10,
-    backgroundColor: '#fff',
-  },
-  categoryButton: {
-    marginRight: 10,
-    paddingVertical: 6,
-    paddingHorizontal: 15,
-    borderRadius: 20,
-    backgroundColor: '#e0e0e0',
-  },
-  categoryButtonActive: {
-    backgroundColor: '#007bff',
-  },
+  container: { flex: 1, backgroundColor: '#ffe4ec' },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 10, backgroundColor: '#ffccd5' },
+  logo: { width: 200, height: 50 },
+  iconContainer: { flexDirection: 'row', alignItems: 'center' },
+  categoryButton: { paddingVertical: 8, paddingHorizontal: 20, borderRadius: 25, backgroundColor: '#ffb3c1', marginHorizontal: 5 },
+  categoryButtonActive: { backgroundColor: '#ff4081' },
   categoryText: {
-    fontSize: 14,
-    color: '#333',
-  },
-  categoryTextActive: {
-    color: '#fff',
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginVertical: 10,
-    marginHorizontal: 10,
-  },
-  newsCard: {
-    flexDirection: 'row',
-    marginHorizontal: 10,
-    marginBottom: 10,
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  newsImage: {
-    width: 100,
-    height: 100,
-  },
-  newsContent: {
-    flex: 1,
-    padding: 10,
-  },
-  newsTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  newsDescription: {
-    fontSize: 12,
-    color: '#555',
-  },
-  searchContainer: {
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-    backgroundColor: '#fff',
-  },
-  searchInput: {
-    height: 40,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    backgroundColor: '#f9f9f9',
-  },
-  dotContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 10,
-    marginBottom: 10,
-  },
-  dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#e0e0e0',
-    marginRight: 5,
-  },
-  dropdownMenu: {
-    position: 'absolute',
-    top: 60,
-    right: 20,
-    backgroundColor: '#fff',
-    borderRadius: 8,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 5,
-    zIndex: 1000,
-  },
-  dropdownItem: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ddd',
-  },
-  dropdownText: {
-    fontSize: 16,
-    color: '#333',
-  },
+    fontSize: 18, // LEBIH BESAR
+    fontWeight: 'bold', // AGAR LEBIH JELAS
+    color: '#ff4081',
+},
+  categoryTextActive: { color: '#fff' },
+  newsCard: { margin: 10, backgroundColor: '#fff', borderRadius: 15, elevation: 5, shadowColor: '#ff80ab', shadowOffset: { width: 0, height: 5 }, shadowOpacity: 0.2, shadowRadius: 10 },
+  newsImage: { width: '100%', height: 200 },
+  newsContent: { padding: 10 },
+  newsTitle: { fontSize: 16, fontWeight: 'bold', color: '#ff4081' },
+  welcomeText: { fontSize: 24, fontWeight: 'bold', color: '#ff4081', textAlign: 'center', marginVertical: 20 },
+  sliderImage: { width: width, height: 200, borderRadius: 15, marginRight: 10 },
+  overlay: { position: 'absolute', width: '100%', height: '100%', backgroundColor: 'rgba(0, 0, 0, 0.3)', justifyContent: 'center', alignItems: 'center', borderRadius: 15 },
+  sliderText: { fontSize: 18, fontWeight: 'bold', color: '#fff', textAlign: 'center', paddingHorizontal: 10 },
 });
+

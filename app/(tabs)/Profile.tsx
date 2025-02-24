@@ -18,80 +18,48 @@ export default function Profile() {
 
   return (
     <ScrollView style={styles.container}>
+      {/* Header with Overlay */}
       <View style={styles.header}>
+        <Image source={require('../../assets/images/BackProf.jpg')} style={styles.headerImage} />
+        <View style={styles.overlay} />
         <TouchableOpacity 
           style={styles.backButton} 
           onPress={() => router.push('/')}
         >
           <Icon name="arrow-back" size={24} color="#fff" />
         </TouchableOpacity>
-        <Image source={require('../../assets/images/BackProf.jpg')} style={styles.headerImage}/>
+        <Text style={styles.headerTitle}>Fleura</Text>
       </View>
 
-      
-      <View style={styles.detailsContainer}>
-        <Text style={styles.title}>Technoinfo</Text>
+      {/* Detail Container */}
+      <View style={styles.content}>
+        {/* About Section */}
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>About Fleura</Text>
+          <Text style={styles.description}>
+            Fleura is a lifestyle and inspiration app that brings the latest trends in fashion, beauty, 
+            wellness, and travel. It provides curated articles, tips, and recommendations to enhance 
+            your daily life. Whether you’re looking for style guides, wellness advice, or travel 
+            inspirations, Fleura has it all in one place.
+          </Text>
+        </View>
 
-        
-        <Text style={styles.sectionTitle}>About App</Text>
-        <Text style={styles.synopsisText}>
-        TechnoInfo is an online news application focusing on the world of technology.
-        It is designed to provide quick and easy access to the latest articles on various tech topics, including AI, gaming, smartphones, software, and programming. 
-        With a clean and user-friendly interface, TechnoInfo allows users to browse news by category, search for specific articles, and stay updated with the latest tech trends. 
-        The app also features a slider for top news and a dropdown menu for quick navigation to user profiles and other features.
-        </Text>
+        {/* Features Section */}
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>Features</Text>
+          <View style={styles.featureContainer}>
+            {['Fashion', 'Beauty', 'Lifestyle', 'Travel', 'Food', 'Health', 'Wellness'].map((feature, index) => (
+              <Text key={index} style={styles.featureText}>• {feature}</Text>
+            ))}
+          </View>
+        </View>
 
-        
-        <Text style={styles.sectionTitle}>Group Members</Text>
-        <View style={styles.commentContainer}>
-          <Image
-            source={require('../../assets/images/Rama.png')}
-            style={styles.commentImage}
-          />
-          <View>
-            <Text style={styles.commentName}>Rama Wahyu Hermawan</Text>
-            <Text style={styles.commentText}>16223013</Text>
-          </View>
-        </View>
-        <View style={styles.commentContainer}>
-          <Image
-            source={require('../../assets/images/Thariq.jpeg')} 
-            style={styles.commentImage}
-          />
-          <View>
-            <Text style={styles.commentName}>Richard Thariq Hussain</Text>
-            <Text style={styles.commentText}>16223005</Text>
-          </View>
-        </View>
-        <View style={styles.commentContainer}>
-          <Image
-            source={require('../../assets/images/Sophia.jpeg')} 
-            style={styles.commentImage}
-          />
-          <View>
-            <Text style={styles.commentName}>Sophia Nur Rohmah</Text>
-            <Text style={styles.commentText}>16223006</Text>
-          </View>
-        </View>
-        <View style={styles.commentContainer}>
-          <Image
-            source={require('../../assets/images/Tirto.jpeg')} 
-            style={styles.commentImage}
-          />
-          <View>
-            <Text style={styles.commentName}>Tirto Rizaldy</Text>
-            <Text style={styles.commentText}>16221001</Text>
-          </View>
-        </View>
-        <View style={styles.commentContainer}>
-          <Image
-            source={require('../../assets/images/Dede.png')} 
-            style={styles.commentImage}
-          />
-          <View>
-            <Text style={styles.commentName}>Dede Misbah</Text>
-            <Text style={styles.commentText}>16223009</Text>
-          </View>
+        {/* Developer Section */}
+        <View style={[styles.card, styles.centerCard]}>
+          <Text style={styles.sectionTitle}>Name</Text>
+          <Image source={require('../../assets/images/Dede.png')} style={styles.memberImage} />
+          <Text style={styles.memberName}>Nisrina Ayundha Irwansyah</Text>
+          <Text style={styles.memberId}>16223001</Text>
         </View>
       </View>
     </ScrollView>
@@ -101,74 +69,94 @@ export default function Profile() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#ffe4e9',
   },
   header: {
     position: 'relative',
-  },
-  backButton: {
-    position: 'absolute',
-    top: 40,
-    left: 20,
-    zIndex: 10,
-  },
-  backText: {
-    fontSize: 16,
-    color: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 280,
   },
   headerImage: {
     width: '100%',
-    height: 250,
+    height: '100%',
     resizeMode: 'cover',
   },
-  detailsContainer: {
-    padding: 20,
-    backgroundColor: '#fff',
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    marginTop: -20,
+  overlay: {
+    position: 'absolute',
+    width: '100%',
+    height: '100%',
+    backgroundColor: 'rgba(255, 182, 193, 0.5)', // Overlay pink pastel
   },
-  title: {
-    fontSize: 24,
+  backButton: {
+    position: 'absolute',
+    top: 50,
+    left: 20,
+    zIndex: 10,
+  },
+  headerTitle: {
+    position: 'absolute',
+    bottom: 30,
+    fontSize: 32,
     fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 10,
+    color: '#fff',
+    backgroundColor: 'rgba(255, 105, 180, 0.6)',
+    paddingHorizontal: 20,
+    paddingVertical: 5,
+    borderRadius: 8,
+  },
+  content: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+  },
+  card: {
+    backgroundColor: '#fff0f5',
+    padding: 15,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+    marginBottom: 15,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
-    color: '#333',
-    marginTop: 20,
-    marginBottom: 10,
+    color: '#c71585',
+    marginBottom: 8,
   },
-  synopsisText: {
-    fontSize: 14,
-    color: '#555',
-    lineHeight: 20,
+  description: {
+    fontSize: 15,
+    color: '#d87093',
+    lineHeight: 22,
   },
-  commentContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
+  featureContainer: {
+    flexWrap: 'wrap',
+  },
+  featureText: {
+    fontSize: 15,
+    color: '#ff69b4',
+    fontWeight: 'bold',
+    marginVertical: 3,
+  },
+  centerCard: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  memberImage: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
     marginVertical: 10,
   },
-  commentImage: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    marginRight: 10,
-  },
-  commentName: {
-    fontSize: 14,
+  memberName: {
+    fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+    color: '#c71585',
   },
-  commentDate: {
-    fontSize: 12,
-    color: '#aaa',
-    marginBottom: 5,
-  },
-  commentText: {
-    fontSize: 14,
-    color: '#555',
+  memberId: {
+    fontSize: 16,
+    color: '#d87093',
   },
 });

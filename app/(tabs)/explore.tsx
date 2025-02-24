@@ -9,16 +9,14 @@ import {
   Image,
   TouchableOpacity,
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
 import axios from 'axios';
 import { useRouter } from 'expo-router';
 
-const IndexScreen = () => {
+const ExploreScreen = () => {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredArticles, setFilteredArticles] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState('All');
   const apiKey = 'c70808c9ec174ae6bde285ecc6b9c4ce';
   const router = useRouter();
 
@@ -27,21 +25,16 @@ const IndexScreen = () => {
   }, []);
 
   useEffect(() => {
-    const filtered = articles.filter((article) => {
-      const matchesSearch = !searchQuery || article.title.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCategory =
-        selectedCategory === 'All' ||
-        (selectedCategory === 'Trending News' && isTrendingArticle(article));
-
-      return matchesSearch && matchesCategory && !isRemovedArticle(article);
-    });
+    const filtered = articles.filter((article) =>
+      article.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
     setFilteredArticles(filtered);
-  }, [searchQuery, articles, selectedCategory]);
+  }, [searchQuery, articles]);
 
   const fetchNews = async () => {
     try {
       const response = await axios.get(
-        `https://newsapi.org/v2/everything?q=technology+OR+game+OR+AI+OR+smartphone+OR+programming+OR+software+OR+developer&language=en&pageSize=40&apiKey=${apiKey}`
+        `https://newsapi.org/v2/top-headlines?language=en&pageSize=40&apiKey=${apiKey}`
       );
       setArticles(response.data.articles);
     } catch (error) {
@@ -49,20 +42,6 @@ const IndexScreen = () => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const isRemovedArticle = (article) => {
-    return (
-      (article.title && article.title.includes('[Removed]')) ||
-      (article.description && article.description.includes('[Removed]'))
-    );
-  };
-
-  const isTrendingArticle = (article) => {
-    return articles
-      .sort((a, b) => b.readCount - a.readCount) 
-      .slice(0, 10)
-      .includes(article);
   };
 
   const renderItem = ({ item }) => (
@@ -90,48 +69,26 @@ const IndexScreen = () => {
   if (loading) {
     return (
       <View style={styles.loader}>
-        <ActivityIndicator size="large" color="#0000ff" />
+        <ActivityIndicator size="large" color="#ff80ab" />
       </View>
     );
   }
 
   return (
     <View style={styles.container}>
-      {/* Sticky Header */}
       <View style={styles.stickyHeader}>
         <View style={styles.header}>
           <Image source={require('../../assets/images/technoinfo.png')} style={styles.logo} />
         </View>
         <TextInput
           style={styles.searchInput}
-          placeholder="Search articles..."
+          placeholder="Cari berita..."
+          placeholderTextColor="#ff80ab"
           value={searchQuery}
           onChangeText={(text) => setSearchQuery(text)}
         />
-        <View style={styles.categoryContainer}>
-          {['All', 'Trending News'].map((category) => (
-            <TouchableOpacity
-              key={category}
-              style={[
-                styles.categoryButton,
-                selectedCategory === category && styles.categoryButtonActive,
-              ]}
-              onPress={() => setSelectedCategory(category)}
-            >
-              <Text
-                style={[
-                  styles.categoryText,
-                  selectedCategory === category && styles.categoryTextActive,
-                ]}
-              >
-                {category}
-              </Text>
-            </TouchableOpacity>
-          ))}
-        </View>
       </View>
-
-      {/* Article List */}
+      
       <FlatList
         data={filteredArticles}
         renderItem={renderItem}
@@ -145,7 +102,7 @@ const IndexScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#ffe4ec',
   },
   stickyHeader: {
     position: 'absolute',
@@ -153,9 +110,9 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 1000,
-    backgroundColor: '#F2F2F2',
+    backgroundColor: '#ffccd5',
     elevation: 5,
-    shadowColor: '#000',
+    shadowColor: '#ff80ab',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 8,
@@ -165,73 +122,49 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 10,
+    backgroundColor: '#ffe4ec',
   },
   logo: {
     width: 200,
     height: 50,
   },
-  iconContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
   searchInput: {
     height: 40,
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    paddingHorizontal: 10,
+    borderColor: '#ff80ab',
+    borderRadius: 20,
+    paddingHorizontal: 15,
     marginBottom: 10,
     marginHorizontal: 10,
-    backgroundColor: '#f9f9f9',
-  },
-  categoryContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 10,
-    paddingHorizontal: 10,
-  },
-  categoryButton: {
-    paddingVertical: 8,
-    paddingHorizontal: 15,
-    borderRadius: 20,
-    backgroundColor: '#e0e0e0',
-  },
-  categoryButtonActive: {
-    backgroundColor: '#007bff',
-  },
-  categoryText: {
-    fontSize: 14,
-    color: '#555',
-  },
-  categoryTextActive: {
-    color: '#fff',
-    fontWeight: 'bold',
+    backgroundColor: '#fff',
+    color: '#ff4081',
   },
   card: {
     backgroundColor: '#fff',
     marginBottom: 10,
     padding: 15,
-    borderRadius: 8,
-    shadowColor: '#000',
+    borderRadius: 15,
+    shadowColor: '#ff80ab',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.2,
     shadowRadius: 8,
-    elevation: 2,
+    elevation: 4,
   },
   image: {
     width: '100%',
     height: 200,
-    borderRadius: 8,
+    borderRadius: 12,
     marginBottom: 10,
   },
   title: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 5,
+    color: '#ff4081',
   },
   description: {
     fontSize: 14,
-    color: '#555',
+    color: '#ff80ab',
   },
   loader: {
     flex: 1,
@@ -240,4 +173,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default IndexScreen;
+export default ExploreScreen;
